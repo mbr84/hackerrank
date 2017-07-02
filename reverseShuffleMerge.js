@@ -14,16 +14,13 @@ const minimalString = (string) => {
   const seen = {}
   let result = ""
   let bestSeen = { char: "|", idx: string.length + 1 } // "z" < "|" => true
-  const funcs = [
-      char => seen[char].used++,
-      char => result += char,
-      () => bestSeen.char = "|"
-    ]
+
+  const funcs = [char => seen[char].used++, char => result += char, () => bestSeen.char = "|"]
   const updateVars = char => funcs.forEach(fn => fn(char))
 
   for (let i = string.length - 1; i >= 0 && result.length < string.length / 2; i--) {
     const char = string[i]
-    seen[char] ? seen[char].seen++ : seen[char] = { seen: 1, used: 0 }
+    seen[char] ? seen[char].total++ : seen[char] = { total: 1, used: 0 }
 
     if (char === letterRanks[0]) {
       updateVars(char)
@@ -32,14 +29,14 @@ const minimalString = (string) => {
         letterRanks.shift()
       }
 
-    } else if (seen[char].seen > letterCounts[char] + seen[char].used) {
+    } else if (seen[char].total > letterCounts[char] + seen[char].used) {
 
       if (char < bestSeen.char) {
         updateVars(char)
 
       } else {
         while (i < bestSeen.idx) {
-          seen[string[i]].seen--
+          seen[string[i]].total--
           i++
         }
         updateVars(string[i])
